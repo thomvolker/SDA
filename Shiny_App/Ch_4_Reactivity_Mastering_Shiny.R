@@ -53,4 +53,54 @@ server1 <- function(input, output, session) {
 # the browser, but instead, it informs Shiny how it could create the string if it needs
 # to. It's up to Shiny when (and even if!) the code should be run. Think of your app as
 # providing Shiny with recipes, not giving it commands.
-shinyApp(ui1, server1)
+
+
+########################################################################################
+## Imperative vs declarative programming                                              ##
+########################################################################################
+
+# The difference between commands and recipes is one of the key differences between two
+# important styles of programming:
+# Imperative programming: you issue a specific command and it's carried out immediately.
+# This is the style of programming you're used to in your analysis scripts: you command
+# R to load your data, transform it, visualise it, and save the results to disk.
+# Declarative programming: you express higher-level goals or describe important 
+# constraints, and rely on someone else to decide how and/or when to translate that into
+# action. This is the style of programming you use in Shiny.
+# With imperative code you say "make me a sandwich". With declarative code you say 
+# "ensure there is a sandwich in the refrigerator whenever I look inside of it". 
+# Imperative code is assertive; declarative code is passive-aggressive. 
+
+# One of the strengths of declarative programming in Shiny is that it allows apps to be
+# extremely lazy. A shiny app will only ever do the minimal amount of work needed to 
+# update the output controls that you can currently see. Shiny's laziness has an 
+# important property. In most R code, you can understand the order of execution by 
+# reading the code from top to bottom. That doesn't work in Shiny, because code is only
+# run when when needed. To understand the order of execution you need to instead look at 
+# the reactive graph, which describes how inputs and outputs are connected.
+
+ui2 <- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
+
+server2 <- function(input, output, session) {
+  text <- reactive(paste0("Hello ", input$name, "!"))
+  output$greeting <- renderText(text())
+}
+
+# The code above makes use of a reactive expression. Reactive expressions can be seen
+# as a tool that reduces duplication in your reactive code by introducing additional 
+# nodes into the reactive graph. Reactive expressions take inputs and produce outputs so
+# they have a shape that combines features of both inputs and outputs. It's important
+# to understand that the order in which your code is run is determined solely by the 
+# reactive graph. This is different from most R code where the execution order is 
+# determined by the order of lines. For example, we could flip the order of the two 
+# lines in our simple server function:
+
+server3 <- function(input, output, session) {
+  output$greeting <- renderText(text())
+  text <- reactive(paste0("Hello ", input$name, "!"))
+}
+
+shinyApp(ui2, server3)
