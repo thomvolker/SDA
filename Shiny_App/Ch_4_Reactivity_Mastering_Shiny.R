@@ -103,4 +103,155 @@ server3 <- function(input, output, session) {
   text <- reactive(paste0("Hello ", input$name, "!"))
 }
 
-shinyApp(ui2, server3)
+# Due to Shiny's laziness, the code is only run when the session starts, after `text`
+# has been created. 
+
+########################################################################################
+## Reactive expressions                                                               ##
+########################################################################################
+
+# Reactive expressions are important for two reasons
+# 1. They give Shiny more information so that it can do less recomputation when inputs
+#    change, making apps more efficients.
+# 2. They make it easier for humans to understand the app by simplifying the reactive
+#    graph.
+# Reactive expressions have a flavour of both inputs and outputs:
+# Like inputs, you can use the results of a reactive expression in an output. And like
+# outputs, reactive expressions depend on inputs and automatically know when they need
+# updating. 
+# Because of this duality, some functions work with eiter reactive inputs or expressions,
+# and some functions work with either reactive expressions or reactive outputs. We'll 
+# use producers to refer to either reactive inputs or expressions, and consumers to
+# refer to either reactive expressions or outputs. 
+
+library(ggplot2)
+
+histogram <- function(x1, x2, binwidth = .1, xlim = c(-3,3)) {
+  df <- data.frame(
+    x = c(x1, x2),
+    g = c(rep("x1", length(x1)), rep("x2", length(x2)))
+  )
+  
+  ggplot(df, aes(x, fill = g)) +
+    geom_histogram(binwidth = binwidth) +
+    coord_cartesian(xlim = xlim) + 
+    theme_classic()
+}
+
+t_test <- function(x1, x2) {
+  test <- t.test(x1, x2)
+  
+  sprintf(
+    "p value: %0.3f\n[%0.2f, %0.2f]",
+    test$p.value, test$conf.int[1], test$conf.int[2]
+  )
+}
+
+x1 <- rnorm(100, mean = 0, sd = 0.5)
+x2 <- rnorm(200, mean = 0.15, sd = 0.9)
+
+histogram(x1, x2)
+cat(t_test(x1, x2))
+
+# Extracting imperative code out into regular functions is an important technique for
+# all Shiny apps: the more code you can extract out of your app, the easier it will be
+# to understand. This is good software engineering because it helps isolate concerns:
+# the functions outside of the app focus on the computation so that the code inside of
+# the app can focus on responding to user actions. 
+
+# If one wants to use these functions to quickly explore a bunch of simulations, a Shiny
+# app is a great way to do this because it lets you avoid tediously modifying and 
+# re-running R code. Below, the pieces are wrapped into a Shiny app where one can 
+# interactively tweak the inputs. 
+
+ui4 <- fluidPage(
+  fluidRow(
+    column(4,
+           "Distribution 1",
+           numericInput("n1", label = "n", value = 1000, min = 1),
+           numericInput("mean1", label = "µ", value = 0, step = 0.1),
+           numericInput("sd1", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+           ),
+    column(4,
+           "Distribution 2",
+           numericInput("n2", label = "n", value = 1000, min = 1),
+           numericInput("mean2", label = "µ", value = 0, step = 0.1),
+           numericInput("sd2", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+           ),
+    column(4,
+           "Histogram",
+           numericInput("binwidth", label = "Bin width", value = 0.1, step = 0.1),
+           sliderInput("range", label = "range", value = c(-3,3), min = -5, max = 5)
+           )
+  ),
+  fluidRow(
+    column(9, plotOutput("hist")),
+    column(3, verbatimTextOutput("ttest"))
+  )
+)
+
+server4 <- function(input, output, session) {
+  output$hist <- renderPlot({
+    x1 <- rnorm(input$n1, input$mean1, input$sd1)
+    x2 <- rnorm(input$n2, input$mean2, input$sd2)
+    
+    histogram(x1, x2, binwidth = input$binwidth, xlim = input$range)
+  }, res = 96)
+  
+  output$ttest <- renderText({
+    x1 <- rnorm(input$n1, input$mean1, input$sd1)
+    x2 <- rnorm(input$n2, input$mean2, input$sd2)
+    
+    t_test(x1, x2)
+  })
+}
+
+########################################################################################
+## The reactive graph                                                                 ##
+########################################################################################
+
+# Shiny updats an output only when the inputs it refers to change, but it's not smart 
+# enough to only selectively run pieces of code inside an output. In other words, 
+# outputs are atomic: they're either executed or not as a whole. The fact that in the 
+# code above almost everything is connected to eachother, results in a very dense 
+# reactive graph, which poses two problens:
+# 1. The app is hard to understand because there are so many connections. There are no
+#    pieces of the app that you can pull out and analyse in isolation.
+# 2. The app is inefficient because it does more work than necessary. For example, if
+#    you change the breaks of the plot, the data is recalculated; if you change the 
+#    value of n1, x2 is updated in two places.
+# There is one major flaw in the app: the histogram and t-test use separate random draws.
+# This is rather misleading, as you'd expect them to be working on the same underlying
+# data. All these issues can be fixed by using reactive expressions.
+
+# Simplifying the graph
+
+server5 <- function(input, output, session) {
+  x1 <- reactive(rnorm(input$n1, input$mean1, input$sd1))
+  x2 <- reactive(rnorm(input$n2, input$mean2, input$sd2))
+  
+  output$hist <- renderPlot({
+    histogram(x1(), x2(), binwidth = input$binwidth, xlim = input$range)
+  }, res = 96)
+  
+  output$ttest <- renderText({
+    t_test(x1(), x2())
+  })
+}
+
+# When you first start working with reactive code, you might wonder why we need reactive
+# expressions. Why can't you use your existing tools for reducing duplication in code?
+# Unfortunately neither of these techniques work in a reactive environment. 
+
+########################################################################################
+## Controlling timing of evaluation                                                   ##
+########################################################################################
+
+# 
+
+
+
+
+
+
+shinyApp(ui4, server5)
