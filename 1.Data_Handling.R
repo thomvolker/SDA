@@ -11,6 +11,11 @@ library(tidyverse)
 ## excluded as well).
 data <- read.csv("president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cycle != ";")
 
+
+#########################################################################################
+## Add actual presidential results of 2016 election                                    ##
+#########################################################################################
+
 ## Look at all unique states
 unique(data$state)
 
@@ -46,8 +51,8 @@ pop_dat <- pop_dat %>%
             version = unique(version),
             notes = unique(notes)) %>%
   pivot_wider(names_from = candidate, values_from = candidatevotes) %>%
-  mutate(prop_clinton = Clinton / totalvotes,
-         prop_trump = Trump / totalvotes)
+  mutate(prop_clinton = 100 * (Clinton / totalvotes),
+         prop_trump = 100 * (Trump / totalvotes))
 
 ## Now extract only the states and the votes
 pop_votes <- pop_dat[,c("state", "prop_clinton", "prop_trump")]
@@ -57,8 +62,8 @@ pop_votes <- pop_dat[,c("state", "prop_clinton", "prop_trump")]
 pop_votes <- bind_rows(pop_votes, 
                        data.frame(state = c("U.S.", "Maine CD-1", "Maine CD-2", 
                                             "Nebraska CD-1", "Nebraska CD-2", "Nebraska CD-3"),
-                                  prop_clinton = c(.482, .5396, .4097, .36, .45, .20),
-                                  prop_trump = c(.461, .3915, .5126, .56, .47, .74)))
+                                  prop_clinton = c(48.2, 53.96, 40.97, 36, 45, 20),
+                                  prop_trump = c(46.1, 39.15, 51.26, 56, 47, 74)))
 
 ## Now add variables to the total dataset for the population score of trump and clinton
 ## and loop over all states to add the population score in that state to the dataset
@@ -70,6 +75,22 @@ for (i in 1:nrow(pop_votes)) {
   data$pop_trump[data$state %in% pop_votes$state[i]] <- pop_votes$prop_trump[i]
 }
 
+#########################################################################################
+## Difference between raw and adjusted proportions, and the correct structure of the   ##
+## variables                                                                           ##
+#########################################################################################
 
-
+data <- data %>%
+  mutate(forecastdate = as.Date(forecastdate, format = "%m/%d/%y"),
+         startdate =  as.Date(startdate, format = "%m/%d/%Y"),
+         enddate = as.Date(enddate, format = "%m/%d/%Y"),
+         samplesize = as.numeric(samplesize),
+         poll_wt = as.numeric(poll_wt),
+         rawpoll_clinton = as.numeric(rawpoll_clinton),
+         rawpoll_trump = as.numeric(rawpoll_trump),
+         adjpoll_clinton = as.numeric(adjpoll_clinton),
+         adjpoll_trump = as.numeric(adjpoll_trump),
+         raw_adj_dif_clinton = adjpoll_clinton - rawpoll_clinton,
+         raw_adj_dif_trump = adjpoll_trump - rawpoll_trump,
+         createddate = as.Date(createddate, format = "%m/%d/%y"))
 
