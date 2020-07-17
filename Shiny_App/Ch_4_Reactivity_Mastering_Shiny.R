@@ -247,11 +247,149 @@ server5 <- function(input, output, session) {
 ## Controlling timing of evaluation                                                   ##
 ########################################################################################
 
-# 
+ui6 <- fluidPage(
+  fluidRow(
+    column(3,
+           numericInput("lambda1", label = "lambda1", value = 3),
+           numericInput("lambda2", label = "lambda2", value = 3),
+           numericInput("n", label = "n", value = 1000, min = 0)
+           ),
+    column(9, plotOutput("hist"))
+  )
+)
+
+server6 <- function(input, output, session) {
+  x1 <- reactive(rpois(input$n, input$lambda1))
+  x2 <- reactive(rpois(input$n, input$lambda2))
+  output$hist <- renderPlot({
+    histogram(x1(), x2(), binwidth = 1, xlim = c(0,40))
+  }, res = 96)
+}
+
+# Timed invalidation
+# Imagine you wanted to reinforce the fact that this is for simulated data by constantly
+# resimulating the data, so that you see an animation rather than a static plot. We can 
+# increase the frequency of updates with a new function: reactiveTimer().
+# reactiveTimer() is a reactive expression that has a dependency on a hidden input: the
+# current time. You can use a reactiveTimer() when you want a reactive expression to
+# invalidate itself more than it otherwise would. 
+
+server7 <- function(input, output, session) {
+  timer <- reactiveTimer(1000)
+  
+  x1 <- reactive({
+    timer()
+    rpois(input$n, input$lambda1)
+  })
+  x2 <- reactive({
+    timer()
+    rpois(input$n, input$lambda2)
+  })
+  output$hist <- renderPlot({
+    histogram(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+
+# Note how we use timer() in the reactive expressions that compute x1() and x2(): we call
+# it, but don't use the value. This lets x1 and x2 take a dependency on timer, without
+# worrying about exactly what value it returns.
+
+# On click
+# In the above scenario, think about what would happen if the simulation code took 1
+# second to run. We perform the simulation every 0.5s, so Shiny would have more and more
+# to do, ,and would never be able to catch up. The same problem can happen if someone is
+# rapidly clicking buttons in your app and the computation is relatively expensive. It's
+# possible to create a big backlog of work for Shiny, and while it's working on the 
+# backlog, it can't respond to any new events. This leads to a poor user experience.
+
+# If this situation arises in your app, you might want to require the user to opt-in to
+# performing the expensive calculation by requiring them to click a button. This is a 
+# great use case for an actionButton():
+
+ui8 <- fluidPage(
+  fluidRow(
+    column(3,
+           numericInput("lambda1", label = "lambda1", value = 3),
+           numericInput("lambda2", label = "lambda2", value = 3),
+           numericInput("n", label = "n", value = 1000, min = 0),
+           actionButton("simulate", "Simulate!")
+           ),
+    column(9, plotOutput("hist"))
+    )
+)
+
+# To use the action button, we need to learn a new tool. To see why, let's first tackle
+# the problem using the same approach as above. As above, we refer to simulate without
+# using its value to take a reactive dependency on it.
+
+server8 <- function(input, output, session) {
+  x1 <- reactive({
+    input$simulate
+    rpois(input$n, input$lambda1)
+  })
+  x2 <- reactive({
+    input$simulate
+    rpois(input$n, input$lambda2)
+  })
+  output$hist <- renderPlot({
+    histogram(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+
+# However, this approach doesn't achieve our goal, because it just introduces a new 
+# dependency: x1() and x2() will update when we click the simulate button, but they'll 
+# also continue to update when lambda1, lambda2 or n change. We want to replace the 
+# existing dependencies, not add to them. To solve this problem, we need a new tool: a
+# way to use input values without taking a reactive dependency on them. We need
+# eventReactive(), which has two arguments: the first argument specifies what to take a
+# dependency on, and the second argument specifies what to compute. That allows this app 
+# to only compute x1() and x2() when simulate is clicked:
+
+server9 <- function(input, output, session) {
+  x1 <- eventReactive(input$simulate, {
+    rpois(input$n, input$lambda1)
+  })
+  x2 <- eventReactive(input$simulate, {
+    rpois(input$n, input$lambda2)
+  })
+  output$hist <- renderPlot({
+    histogram(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+
+# Observers
+# So far, we've focused on what's happening inside the app. But sometimes you need to
+# reach outside of the app and cause side-effects to happen elsewhere in the world. This
+# might be saving a file to a shared network drive, sending data to a web API, updating 
+# a database, or (most commonly) printing a debugging message to the console. These
+# actions don't affect how your app looks, so you can't use an output and a render 
+# function. Instead, you need to use an observer.
+# observeEvent() is very similar to eventReactive(). It has two important arguments: 
+# eventExpr and handlerExpr. The first argument is the input or expression to take a
+# dependency on; the second argument is the code that will be run. For example, the 
+# following modification to server() means that every time that name is updated, a 
+# message will be sent to the console
+
+ui10 <- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
 
 
+server10 <- function(input, output, session) {
+  text <- reactive(paste0("Hello ", input$name, "!"))
+  
+  output$greeting <- renderText(text())
+  observeEvent(input$name, {
+    message("Greeting performed")
+  })
+}
 
+# There are two important differences between observeEvent() and eventReactive():
+# 1. You don't assign the result of observeEvent() to a variable, so
+# 2. you can't refer to it from other reactive consumers.
+# Observers and outputs are closely related. You can think of outputs as having a special
+# side effect: updating the HTML in the user's browser. To emphasise this closeness, 
+# we'll draw them the same way in the reactive graph. 
 
-
-
-shinyApp(ui4, server5)
+shinyApp(ui10, server10)
