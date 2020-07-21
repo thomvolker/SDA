@@ -11,7 +11,6 @@ library(tidyverse)
 ## excluded as well).
 data <- read.csv("president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cycle != ";")
 
-
 #########################################################################################
 ## Add actual presidential results of 2016 election                                    ##
 #########################################################################################
@@ -93,4 +92,8 @@ data <- data %>%
          raw_adj_dif_clinton = adjpoll_clinton - rawpoll_clinton,
          raw_adj_dif_trump = adjpoll_trump - rawpoll_trump,
          createddate = as.Date(createddate, format = "%m/%d/%y"))
+
+
+data$rawpoll_clinton[data$rawpoll_clinton == 600] <- NA
+
 
