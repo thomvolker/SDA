@@ -3,6 +3,7 @@ source("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/1.Data_Handling.R")
 source("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/Shiny_App/functions.R")
 
 ui <- fluidPage(
+  theme = shinythemes::shinytheme("paper"),
   fluidRow(
     column(3,
            selectInput("state", "State", unique(data$state))
