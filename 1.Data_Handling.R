@@ -100,6 +100,6 @@ data <- data %>%
   pivot_longer(cols = c("rawpoll_trump", "adjpoll_trump", "rawpoll_clinton", "adjpoll_clinton"), 
                names_to = c("raw_adj", ".value"),
                names_sep = "_") %>%
-  mutate(raw_adj =  recode(raw_adj, "adjpoll" = "Adjusted", "rawpoll" = "Raw")) %>% View
+  mutate(raw_adj =  recode(raw_adj, "adjpoll" = "Adjusted", "rawpoll" = "Raw"))
 
 
