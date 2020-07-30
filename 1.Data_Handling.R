@@ -9,7 +9,7 @@ library(tidyverse)
 ## semicolon, which we exclude from the data, additionally, there are five columns of
 ## nonsense in the dataframe (probably due to how I read the data in), which are 
 ## excluded as well).
-data <- read.csv("president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cycle != ";")
+data <- read.csv("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cycle != ";")
 
 #########################################################################################
 ## Add actual presidential results of 2016 election                                    ##
@@ -95,5 +95,11 @@ data <- data %>%
 
 
 data$rawpoll_clinton[data$rawpoll_clinton == 600] <- NA
+
+data <- data %>%
+  pivot_longer(cols = c("rawpoll_trump", "adjpoll_trump", "rawpoll_clinton", "adjpoll_clinton"), 
+               names_to = c("raw_adj", ".value"),
+               names_sep = "_") %>%
+  mutate(raw_adj =  recode(raw_adj, "adjpoll" = "Adjusted", "rawpoll" = "Raw")) %>% View
 
 
