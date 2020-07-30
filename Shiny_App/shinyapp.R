@@ -2,31 +2,57 @@
 source("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/1.Data_Handling.R")
 source("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/Shiny_App/functions.R")
 
+library(shiny)
+
 ui <- fluidPage(
-  theme = shinythemes::shinytheme("paper"),
-  fluidRow(
-    column(3,
-           selectInput("state", "State", unique(data$state))
-           ),
-    column(3,
-           selectInput("who", "Trump and/or Clinton", c("Trump", "Clinton", "Trump & Clinton"))
-           ),
-    column(4, 
-           sliderInput("period", "Poll period", min = min(data$enddate), max(data$enddate), 
-                       value = c(min(data$enddate), max(data$enddate)))
-           )
+  
+  theme = shinythemes::shinytheme("spacelab"),
+  
+  headerPanel("U.S. 2016 Election Surveys"),
+
+  sidebarPanel(
+    selectInput("state", "State", unique(data$state)[c(1, order(unique(data$state)[-1]) + 1)]),
+    selectInput("who", "Trump and/or Clinton", 
+                c("Trump" = "trump", "Clinton" = "clinton", 
+                  "Difference (Trump - Clinton)" = "dif")),
+    selectInput("xvar", "Independent variable",
+                c("Enddate of survey" = "enddate", "Grade" = "grade",
+                  "Sample size" = "samplesize", "Population" = "population")),
+    sliderInput("period", "Poll period", 
+                min = min(data$enddate), max(data$enddate), 
+                value = c(min(data$enddate), max(data$enddate)))
   ),
-  fluidRow(
-    column(3,
-           selectInput("xvar", "Independent variable", 
-                       c("forecastdate", "startdate", "enddate",
-                         "grade", "samplesize", "population"))
-           )
-  ),
-  fluidRow(
-    plotOutput("results")
-  )
+  
+  mainPanel(plotOutput("results"))
+  
 )
+ 
+  # 
+  # fluidRow(
+  #   column(3,
+  #          selectInput("state", "State", unique(data$state)[c(1, order(unique(data$state)[-1]) + 1)])
+  #          )),
+  # fluidRow(
+  #   column(3,
+  #          selectInput("who", "Trump and/or Clinton", c("Trump" = "trump", "Clinton" = "clinton", "Difference (Trump - Clinton)" = "dif"))
+  #          )),
+  # fluidRow(
+  #   column(4, 
+  #          sliderInput("period", "Poll period", min = min(data$enddate), max(data$enddate), 
+  #                      value = c(min(data$enddate), max(data$enddate)))
+  #          )
+  # ),
+  # fluidRow(
+  #   column(3,
+  #          selectInput("xvar", "Independent variable", 
+  #                      c("End of survey" = "enddate", "Grade" = "grade", 
+  #                        "Sample size" = "samplesize", 
+  #                        "Population" = "population"))
+  #          )
+  # ),
+  # fluidRow(
+  #   plotOutput("results")
+  # )
 
 server <- function(input, output, session) {
   
@@ -38,7 +64,7 @@ server <- function(input, output, session) {
                                raw_adj_dif_clinton, raw_adj_dif_trump))
   
   output$results <- renderPlot({
-    dataset() %>% plot_results(., input$who)
+    dataset() %>% plot_results(., input$who, input$xvar)
   }, res = 96)
 }
 
