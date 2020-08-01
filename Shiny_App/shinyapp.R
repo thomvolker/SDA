@@ -27,7 +27,7 @@ ui <- navbarPage("Survey Data Analysis",
   ),
   
   mainPanel(
-    plotOutput("results")
+    plotOutput("results", height = "600px")
     )
   )
 )
