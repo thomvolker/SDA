@@ -91,8 +91,8 @@ data <- data %>%
          adjpoll_trump = as.numeric(adjpoll_trump),
          raw_adj_dif_clinton = adjpoll_clinton - rawpoll_clinton,
          raw_adj_dif_trump = adjpoll_trump - rawpoll_trump,
-         createddate = as.Date(createddate, format = "%m/%d/%y"))
-
+         createddate = as.Date(createddate, format = "%m/%d/%y"),
+         months = enddate %>% format("%Y-%m") %>% paste0(., "-01") %>% as.Date)
 
 data$rawpoll_clinton[data$rawpoll_clinton == 600] <- NA
 
@@ -100,6 +100,9 @@ data <- data %>%
   pivot_longer(cols = c("rawpoll_trump", "adjpoll_trump", "rawpoll_clinton", "adjpoll_clinton"), 
                names_to = c("raw_adj", ".value"),
                names_sep = "_") %>%
-  mutate(raw_adj =  recode(raw_adj, "adjpoll" = "Adjusted", "rawpoll" = "Raw"))
+  mutate(raw_adj =  recode(raw_adj, "adjpoll" = "Adjusted", "rawpoll" = "Raw")) %>%
+  group_by(months, raw_adj) %>%
+  mutate(month_mean_clinton = mean(clinton, na.rm = T),
+         month_mean_trump = mean(trump, na.rm = T))
 
 
