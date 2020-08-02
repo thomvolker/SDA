@@ -3,10 +3,14 @@ library(scales)
 
 Sys.setlocale("LC_TIME", "C")
 
-plot_results <- function(data, who, xvar) {
+plot_results <- function(data, who, xvar, state) {
+  
+  if(nrow(data) == 0) {stop("There are no observations that meet the input requirements.")}
   
   us_trump <- 46.1
   us_clinton <- 48.2
+  
+  first_month <- min(data$months)
   
   state_trump <- unique(data$pop_trump)
   state_clinton <- unique(data$pop_clinton)
@@ -18,9 +22,14 @@ plot_results <- function(data, who, xvar) {
     scale_color_brewer(palette = "Set1") +
     scale_fill_brewer(palette = "Set1") +
     theme_classic() +
-    theme(legend.position = "bottom", legend.title = element_blank())
+    theme(legend.position = "bottom", legend.title = element_blank(),
+          axis.title.x = element_text(vjust = -2))
   
   if (xvar == "enddate") {
+    
+    monthly_means <- data %>% # necessary because extracting text labels from the complete data
+      summarise(month_mean_clinton = mean(month_mean_clinton), # is very very slow
+                month_mean_trump = mean(month_mean_trump))
     
     base_plot <- base_plot +
       scale_x_date(date_breaks = "months", date_labels = "%b %y") +
@@ -30,26 +39,47 @@ plot_results <- function(data, who, xvar) {
       
       base_plot +
         geom_point(aes(y = trump), size = .5) +
-        geom_abline(intercept = us_trump, slope = 0) +
-        geom_abline(intercept = state_trump, slope = 0, linetype = "dashed") +
-        ylim(0, 100)
+        geom_abline(aes(linetype = paste0("True population value in ", state), intercept = state_trump, slope = 0)) +
+        scale_linetype_manual(values = "dashed") +
+        annotate("label", x = first_month, y = max(data$trump) + 5, color = "white",fill = "black",
+                 label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), hjust = 0) +
+        geom_label(data = monthly_means,
+                   aes(x = months, y = rep(c(5,12.5), length(unique(months))),
+                       label = paste0(round(month_mean_trump, digits = 1), "%")),
+                   position = "identity", show.legend = FALSE, hjust = 0) +
+         ylim(0, 100)
       
     }
     else if (who == "clinton") {
       
       base_plot +
         geom_point(aes(y = clinton), size = .5) +
-        geom_abline(intercept = us_clinton, slope = 0) +
-        geom_abline(intercept = state_clinton, slope = 0, linetype = "dashed") +
+        geom_abline(aes(linetype = paste0("True population value in ", state), intercept = state_clinton, slope = 0)) +
+        scale_linetype_manual(values = "dashed") +
+        annotate("label", x = first_month, y = max(data$clinton) + 5, color = "white",fill = "black",
+                 label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), hjust = 0) +
+        geom_label(data = monthly_means,
+                   aes(x = months, y = rep(c(5,12.5), length(unique(months))),
+                       label = paste0(round(month_mean_clinton, digits = 1), "%")),
+                   position = "identity", show.legend = FALSE, hjust = 0) +
         ylim(0, 100)
+      
     }
     else if (who == "dif") {
       
       base_plot +
+        ylim(-100, 100) +
         geom_point(aes(y = trump - clinton), size = .5) +
-        geom_abline(intercept = us_trump - us_clinton, slope = 0) +
-        geom_abline(intercept = state_trump - state_clinton, slope = 0, linetype = "dashed") +
-        ylim(-100, 100)
+        geom_abline(aes(linetype = paste0("True population value in ", state), 
+                        intercept = state_trump - state_clinton, slope = 0)) +
+        scale_linetype_manual(values = "dashed") +
+        annotate("label", x = first_month, y = max(data$trump - data$clinton + 5), 
+                 color = "white", fill = "black",
+                 label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), hjust = 0) +
+        geom_label(data = monthly_means,
+                   aes(x = months, y = rep(c(-75, -90), length(unique(months))),
+                       label = paste0(round(month_mean_trump - month_mean_clinton, digits = 1), "%")),
+                   position = "identity", show.legend = FALSE, hjust = 0)
     }
   }
   
