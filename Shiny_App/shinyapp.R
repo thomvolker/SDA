@@ -66,8 +66,11 @@ server <- function(input, output, session) {
                         filter(state == input$state) %>%
                         filter(enddate >= input$period[1] & enddate <= input$period[2]) %>%
                         filter(grade %in% input$grade) %>%
-                        select(xvar = input$xvar, state, clinton, trump, raw_adj,
-                               pop_clinton, pop_trump, raw_adj_dif_clinton, raw_adj_dif_trump))
+                        select(xvar = input$xvar, state, clinton, trump, raw_adj, months,
+                               pop_clinton, pop_trump, raw_adj_dif_clinton, raw_adj_dif_trump) %>%
+                        group_by(months, raw_adj) %>%
+                        mutate(month_mean_clinton = mean(clinton, na.rm = T),
+                               month_mean_trump = mean(trump, na.rm = T))) 
   
   output$results <- renderPlot({
     dataset() %>% plot_results(., input$who, input$xvar)
