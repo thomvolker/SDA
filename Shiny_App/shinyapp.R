@@ -23,9 +23,12 @@ ui <- navbarPage("Survey Data Analysis",
                 unique(data$grade), multiple = TRUE, selected = unique(data$grade)),
     sliderInput("period", "Poll period", 
                 min = min(data$enddate), max(data$enddate), 
-                value = c(min(data$enddate), max(data$enddate)))
+                value = c(min(data$enddate), max(data$enddate))),
+    br(),
+    uiOutput("data_source"),
+    br(),
+    uiOutput("shiny_code")
   ),
-  
   mainPanel(
     plotOutput("results", height = "600px")
     )
@@ -73,12 +76,22 @@ server <- function(input, output, session) {
                                month_mean_trump = mean(trump, na.rm = T))) 
   
   output$results <- renderPlot({
-    dataset() %>% plot_results(., input$who, input$xvar)
+    dataset() %>% plot_results(., input$who, input$xvar, input$state)
   }, res = 96)
   
+  output$data_source <- renderUI({
+    tagList(paste0("The poll data is retrieved from "), 
+            a("https://projects.fivethirtyeight.com/2016-election-forecast/?ex_cid=rrpromo#plus",
+              href = "https://projects.fivethirtyeight.com/2016-election-forecast/?ex_cid=rrpromo#plus"))
+  })
+  
+  output$shiny_code <- renderUI({
+    tagList(paste0("The R-code used to make this Shiny application can be found on "),
+            a("https://github.com/thomvolker/SDA",
+              href = "https://github.com/thomvolker/SDA"))
+  })
 }
 
 shinyApp(ui, server)
-
 
 
