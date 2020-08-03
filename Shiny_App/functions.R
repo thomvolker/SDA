@@ -41,7 +41,7 @@ plot_results <- function(data, who, xvar, state) {
         geom_point(aes(y = trump), size = .5) +
         geom_abline(aes(linetype = paste0("True population value in ", state), intercept = state_trump, slope = 0)) +
         scale_linetype_manual(values = "dashed") +
-        annotate("label", x = first_month, y = max(data$trump) + 5, color = "white",fill = "black",
+        annotate("label", x = first_month, y = max(data$trump, na.rm = T) + 5, color = "white",fill = "black",
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), hjust = 0) +
         geom_label(data = monthly_means,
                    aes(x = months, y = rep(c(5,12.5), length(unique(months))),
@@ -56,7 +56,7 @@ plot_results <- function(data, who, xvar, state) {
         geom_point(aes(y = clinton), size = .5) +
         geom_abline(aes(linetype = paste0("True population value in ", state), intercept = state_clinton, slope = 0)) +
         scale_linetype_manual(values = "dashed") +
-        annotate("label", x = first_month, y = max(data$clinton) + 5, color = "white",fill = "black",
+        annotate("label", x = first_month, y = max(data$clinton, na.rm = T) + 5, color = "white",fill = "black",
                  label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), hjust = 0) +
         geom_label(data = monthly_means,
                    aes(x = months, y = rep(c(5,12.5), length(unique(months))),
@@ -73,7 +73,7 @@ plot_results <- function(data, who, xvar, state) {
         geom_abline(aes(linetype = paste0("True population value in ", state), 
                         intercept = state_trump - state_clinton, slope = 0)) +
         scale_linetype_manual(values = "dashed") +
-        annotate("label", x = first_month, y = max(data$trump - data$clinton + 5), 
+        annotate("label", x = first_month, y = max(data$trump - data$clinton, na.rm = T) + 5, 
                  color = "white", fill = "black",
                  label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), hjust = 0) +
         geom_label(data = monthly_means,
