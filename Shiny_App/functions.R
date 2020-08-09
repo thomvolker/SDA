@@ -274,6 +274,122 @@ plot_results <- function(data, who, xvar, state, box_labs) {
         ylim(-100, 100)
     }
   }
+  
+  else if (xvar == "population") {
+    
+    text_medians <- data %>%
+      group_by(xvar, raw_adj) %>%
+      summarise(trump_m = median(trump),
+                clinton_m = median(clinton))
+    
+    if (who == "trump") {
+      gg_box_plot <- base_plot +
+        geom_abline(aes(linetype = paste0("True population value in ", state), 
+                        intercept = state_trump, 
+                        slope = 0)) +
+        scale_linetype_manual(values = "dashed") +
+        annotate("label", 
+                 x = unique(sort(data$xvar))[1], 
+                 y = max(data$trump, na.rm = T), 
+                 label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
+                 hjust = 0, 
+                 vjust = 0) +
+        geom_boxplot(mapping = aes(y = trump, 
+                                   fill = raw_adj, 
+                                   color = NULL),
+                     outlier.alpha = .25,
+                     position = "dodge2")
+      
+      if(box_labs) {
+        gg_box_plot + 
+          geom_label(data = text_medians,
+                     mapping = aes(y = trump_m,
+                                   group = xvar,
+                                   fill = raw_adj,
+                                   label = paste0(round(trump_m, digits = 0)),
+                                   vjust = 1.2),
+                     position = position_dodge2(width = 0.75),
+                     colour = "white",
+                     fontface = "bold",
+                     show.legend = FALSE)
+      }
+      else gg_box_plot
+    }
+    
+    else if (who == "clinton") {
+      
+      gg_box_plot <- base_plot +
+        geom_abline(aes(linetype = paste0("True population value in ", state), 
+                        intercept = state_clinton, 
+                        slope = 0)) +
+        scale_linetype_manual(values = "dashed") +
+        annotate("label", 
+                 x = unique(sort(data$xvar))[1], 
+                 y = max(data$clinton, na.rm = T), 
+                 label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), 
+                 hjust = 0, 
+                 vjust = 0) +
+        geom_boxplot(mapping = aes(y = clinton, 
+                                   fill = raw_adj, 
+                                   color = NULL),
+                     outlier.alpha = .25,
+                     position = "dodge2")
+      
+      if(box_labs) {
+        gg_box_plot + 
+          geom_label(data = text_medians,
+                     mapping = aes(y = clinton_m,
+                                   group = xvar,
+                                   fill = raw_adj,
+                                   label = paste0(round(clinton_m, digits = 0)),
+                                   vjust = 1.2),
+                     position = position_dodge2(width = 0.75),
+                     colour = "white",
+                     fontface = "bold",
+                     show.legend = FALSE)
+      }
+      else gg_box_plot
+      
+    }
+    
+    else if (who == "dif") {
+      
+      gg_box_plot <- base_plot +
+        geom_abline(aes(linetype = paste0("True population value in ", state), 
+                        intercept = state_trump - state_clinton, 
+                        slope = 0)) +
+        scale_linetype_manual(values = "dashed") +
+        annotate("label", 
+                 x = unique(sort(data$xvar))[1], 
+                 y = max(data$trump - data$clinton, na.rm = T), 
+                 label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), 
+                 hjust = 0, 
+                 vjust = 0) +
+        geom_boxplot(mapping = aes(y = trump - clinton, 
+                                   fill = raw_adj, 
+                                   color = NULL),
+                     outlier.alpha = .25,
+                     position = "dodge2")
+      
+      if(box_labs) {
+        gg_box_plot + 
+          geom_label(data = text_medians,
+                     mapping = aes(y = trump_m - clinton_m,
+                                   group = xvar,
+                                   fill = raw_adj,
+                                   label = paste0(round(trump_m - clinton_m, digits = 0)),
+                                   vjust = 1.2),
+                     position = position_dodge2(width = 0.75),
+                     colour = "white",
+                     fontface = "bold",
+                     show.legend = FALSE)
+      }
+      else gg_box_plot
+      
+    }
+    
+  }
+  
 }
 
 xvar_choices <- c("Enddate of survey" = "enddate", "Grade" = "grade",
