@@ -103,6 +103,9 @@ data <- data %>%
   mutate(raw_adj =  recode(raw_adj, "adjpoll" = "Adjusted", "rawpoll" = "Raw")) %>%
   group_by(months, raw_adj) %>%
   mutate(month_mean_clinton = mean(clinton, na.rm = T),
-         month_mean_trump = mean(trump, na.rm = T))
+         month_mean_trump = mean(trump, na.rm = T)) %>%
+  mutate(population = recode(population, 
+                             "lv" = "Likely voters",
+                             "rv" = "Registered voters"))
 
-#data$population[!data$population %in% c("lv", "rv")] <- NA
+data$population[!data$population %in% c("Likely voters", "Registered voters")] <- "Other"
