@@ -25,6 +25,8 @@ ui <- navbarPage("Survey Data Analysis",
                 min = min(data$enddate), max(data$enddate), 
                 value = c(min(data$enddate), max(data$enddate))),
     br(),
+    checkboxInput("box_labs", "Display boxplot medians"),
+    br(),
     uiOutput("data_source"),
     br(),
     uiOutput("shiny_code")
@@ -76,7 +78,7 @@ server <- function(input, output, session) {
                                month_mean_trump = mean(trump, na.rm = T))) 
   
   output$results <- renderPlot({
-    dataset() %>% plot_results(., input$who, input$xvar, input$state)
+    dataset() %>% plot_results(., input$who, input$xvar, input$state, input$box_labs)
   }, res = 96)
   
   output$data_source <- renderUI({
