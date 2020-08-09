@@ -1,6 +1,6 @@
 
-source("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/1.Data_Handling.R")
-source("~/Documents/M_S/SA_Peter/Survey_Data_Analysis/Shiny_App/functions.R")
+source("data_handling.R")
+source("functions.R")
 
 library(shiny)
 
@@ -29,7 +29,8 @@ ui <- navbarPage("Survey Data Analysis",
     br(),
     uiOutput("data_source"),
     br(),
-    uiOutput("shiny_code")
+    uiOutput("shiny_code"),
+    width = 3
   ),
   mainPanel(
     plotOutput("results", height = "600px")

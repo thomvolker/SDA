@@ -1,0 +1,12 @@
+name: SDA_shinyelectionbias
+title: SDA_shinyelectionbias
+username:
+account: utrecht-university
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2654150
+bundleId: 3492979
+url: https://utrecht-university.shinyapps.io/SDA_shinyelectionbias/
+when: 1596968980.14732
+asMultiple: FALSE
+asStatic: FALSE
