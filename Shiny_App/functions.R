@@ -1,5 +1,6 @@
 library(tidyverse)
 library(scales)
+library(plotly)
 
 Sys.setlocale("LC_TIME", "C")
 
@@ -50,8 +51,6 @@ plot_results <- function(data, who, xvar, state) {
         annotate("label", 
                  x = min(data$months), 
                  y = max(data$trump, na.rm = T) + 5, 
-                 color = "white",
-                 fill = "black",
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
                  hjust = 0) +
         geom_label(data = monthly_means,
@@ -76,8 +75,6 @@ plot_results <- function(data, who, xvar, state) {
         annotate("label", 
                  x = min(data$months), 
                  y = max(data$clinton, na.rm = T) + 5, 
-                 color = "white",
-                 fill = "black",
                  label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), 
                  hjust = 0) +
         geom_label(data = monthly_means,
@@ -102,8 +99,6 @@ plot_results <- function(data, who, xvar, state) {
         annotate("label", 
                  x = min(data$months), 
                  y = max(data$trump - data$clinton, na.rm = T) + 5, 
-                 color = "white", 
-                 fill = "black",
                  label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), 
                  hjust = 0) +
         geom_label(data = monthly_means,
@@ -118,6 +113,11 @@ plot_results <- function(data, who, xvar, state) {
   
   else if (xvar == "grade") {
     
+    text_medians <- data %>%
+      group_by(xvar, raw_adj) %>%
+      summarise(trump_m = median(trump),
+                clinton_m = median(clinton))
+    
     if (who == "trump") {
       base_plot +
         geom_abline(aes(linetype = paste0("True population value in ", state), 
@@ -127,15 +127,25 @@ plot_results <- function(data, who, xvar, state) {
         annotate("label", 
                  x = unique(sort(data$xvar))[1], 
                  y = max(data$trump, na.rm = T), 
-                 color = "black", 
-                 fill = "white",
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
                  hjust = 0, 
                  vjust = 0) +
         geom_boxplot(mapping = aes(y = trump, 
                                    fill = raw_adj, 
                                    color = NULL),
-                     outlier.alpha = .25)
+                     outlier.alpha = .25,
+                     position = "dodge2")  +
+         geom_label(data = text_medians,
+                    mapping = aes(y = trump_m,
+                                  group = xvar,
+                                  fill = raw_adj,
+                                  label = paste0(round(trump_m, digits = 0)),
+                                  vjust = 0),
+                    position = position_dodge2(width = 0.75),
+                    colour = "white",
+                    fontface = "bold",
+                    show.legend = FALSE)
+        
     }
     else if (who == "clinton") {
       base_plot +
@@ -146,8 +156,6 @@ plot_results <- function(data, who, xvar, state) {
         annotate("label", 
                  x = unique(sort(data$xvar))[1], 
                  y = max(data$clinton, na.rm = T), 
-                 color = "black", 
-                 fill = "white",
                  label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), 
                  hjust = 0, 
                  vjust = 0) +
@@ -165,13 +173,14 @@ plot_results <- function(data, who, xvar, state) {
         annotate("label", 
                  x = unique(sort(data$xvar))[1], 
                  y = max(data$trump - data$clinton, na.rm = T), 
-                 color = "black", 
-                 fill = "white",
                  label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), 
                  hjust = 0, 
                  vjust = 0) +
-        geom_boxplot(mapping = aes(y = trump - clinton, fill = raw_adj, color = NULL),
-                     outlier.alpha = .25)
+        geom_boxplot(mapping = aes(y = trump - clinton, 
+                                   fill = raw_adj, 
+                                   color = NULL),
+                     outlier.alpha = .25) +
+        geom_text(mapping = aes(y = median(trump - clinton)))
     }
   }
 }
