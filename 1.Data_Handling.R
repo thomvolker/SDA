@@ -105,4 +105,4 @@ data <- data %>%
   mutate(month_mean_clinton = mean(clinton, na.rm = T),
          month_mean_trump = mean(trump, na.rm = T))
 
-
+#data$population[!data$population %in% c("lv", "rv")] <- NA
