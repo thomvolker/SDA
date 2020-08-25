@@ -26,6 +26,7 @@ ui <- navbarPage("Survey Data Analysis",
                 value = c(min(data$enddate), max(data$enddate))),
     br(),
     checkboxInput("box_labs", "Display boxplot medians"),
+    htmlOutput("warning_text"),
     br(),
     uiOutput("data_source"),
     br(),
@@ -34,7 +35,7 @@ ui <- navbarPage("Survey Data Analysis",
   ),
   mainPanel(
     plotOutput("results", height = "600px")
-    )
+    ),
   )
 )
 
@@ -67,6 +68,11 @@ server <- function(input, output, session) {
             a("https://github.com/thomvolker/SDA",
               href = "https://github.com/thomvolker/SDA",
               style = "word-wrap: break-word;"))
+  })
+  output$warning_text <- renderText({
+    if(input$box_labs & input$xvar %in% c("enddate", "samplesize")) {
+      paste0("<span style=\"color:red\"> The plot is no boxplot, so no medians are displayed. </span>")
+    }
   })
 }
 
