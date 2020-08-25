@@ -71,10 +71,10 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                  hjust = 0) +
         geom_label(data = mean_est,
                    mapping = aes(x = rep(min(data$months), 2),
-                                 y = c(min(data$trump, na.rm = T) - 1,
+                                 y = c(min(data$trump, na.rm = T) - 2,
                                        min(data$trump, na.rm = T) - 
                                          (max(c(data$trump, state_trump), na.rm = T) - 
-                                            min(c(data$trump, state_trump), na.rm = T))/10 - 1),
+                                            min(c(data$trump, state_trump), na.rm = T))/10 - 2),
                                  label = paste0(raw_adj, " mean: ", round(mean_trump, 2), "%")),
                    position = "identity",
                    show.legend = FALSE,
@@ -104,10 +104,10 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                  hjust = 0) +
         geom_label(data = mean_est,
                    mapping = aes(x = rep(min(data$months), 2),
-                                 y = c(min(data$clinton, na.rm = T) - 1,
+                                 y = c(min(data$clinton, na.rm = T) - 2,
                                        min(data$clinton, na.rm = T) - 
                                          (max(c(data$clinton, state_clinton), na.rm = T) - 
-                                            min(c(data$clinton, state_clinton), na.rm = T))/10 - 1),
+                                            min(c(data$clinton, state_clinton), na.rm = T))/10 - 2),
                                  label = paste0(raw_adj, " mean: ", round(mean_clinton, 2), "%")),
                    position = "identity",
                    show.legend = FALSE,
@@ -138,10 +138,10 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                  hjust = 0) +
         geom_label(data = mean_est,
                    mapping = aes(x = rep(min(data$months), 2),
-                                 y = c(min(data$trump - data$clinton, na.rm = T) - 1,
+                                 y = c(min(data$trump - data$clinton, na.rm = T) - 2,
                                        min(data$trump - data$clinton, na.rm = T) - 
                                          (max(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T) - 
-                                            min(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T))/10 - 1),
+                                            min(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T))/10 - 2),
                                  label = paste0(raw_adj, " mean: ", round(mean_trump - mean_clinton, 2), "%")),
                    position = "identity",
                    show.legend = FALSE,
@@ -281,10 +281,10 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                      position = "dodge2") +
         geom_label(data = mean_est,
                    mapping = aes(x = rep(unique(sort(data$xvar))[1], 2),
-                                 y = c(min(data$trump - data$clinton, na.rm = T) - 1,
+                                 y = c(min(data$trump - data$clinton, na.rm = T) - 2,
                                        min(data$trump - data$clinton, na.rm = T) - 
                                          (max(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T) - 
-                                            min(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T))/10 - 1),
+                                            min(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T))/10 - 2),
                                  label = paste0(raw_adj, " mean: ", round(mean_trump - mean_clinton, 2), "%")),
                    position = "identity",
                    show.legend = FALSE,
@@ -317,12 +317,28 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                         intercept = state_trump, 
                         slope = 0)) +
         scale_linetype_manual(values = "dashed") +
+        geom_abline(data = mean_est,
+                    mapping = aes(color = raw_adj,
+                                  intercept = mean_trump,
+                                  slope = c(0,0)),
+                    linetype = "dashed",
+                    show.legend = FALSE) +
         annotate("label", 
-                 x = unique(sort(data$xvar))[1], 
-                 y = max(data$trump, na.rm = T) + 5, 
+                 x = min(data$xvar), 
+                 y = max(c(data$trump, state_trump), na.rm = T) + (max(data$trump, na.rm = T) - min(data$trump, na.rm = T))/5, 
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
-                 hjust = 0, 
+                 hjust = 0,
                  vjust = 0) +
+        geom_label(data = mean_est,
+                   mapping = aes(x = rep(min(data$xvar), 2),
+                                 y = c(min(data$trump, na.rm = T) - 2,
+                                       min(data$trump, na.rm = T) - 
+                                         (max(c(data$trump, state_trump), na.rm = T) - 
+                                            min(c(data$trump, state_trump), na.rm = T))/10 - 2),
+                                 label = paste0(raw_adj, " mean: ", round(mean_trump, 2), "%")),
+                   position = "identity",
+                   show.legend = FALSE,
+                   hjust = 0) +
         scale_x_log10()
     }
     
@@ -334,12 +350,28 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                         intercept = state_clinton, 
                         slope = 0)) +
         scale_linetype_manual(values = "dashed") +
+        geom_abline(data = mean_est,
+                    mapping = aes(color = raw_adj,
+                                  intercept = mean_clinton,
+                                  slope = c(0,0)),
+                    linetype = "dashed",
+                    show.legend = FALSE) +
         annotate("label", 
-                 x = unique(sort(data$xvar))[1], 
-                 y = max(data$clinton, na.rm = T) + 5, 
+                 x = min(data$xvar), 
+                 y = max(c(data$clinton, state_clinton), na.rm = T) + (max(data$clinton, na.rm = T) - min(data$clinton, na.rm = T))/5, 
                  label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), 
-                 hjust = 0, 
+                 hjust = 0,
                  vjust = 0) +
+        geom_label(data = mean_est,
+                   mapping = aes(x = rep(min(data$xvar), 2),
+                                 y = c(min(data$clinton, na.rm = T) - 2,
+                                       min(data$clinton, na.rm = T) - 
+                                         (max(c(data$clinton, state_clinton), na.rm = T) - 
+                                            min(c(data$clinton, state_clinton), na.rm = T))/10 - 2),
+                                 label = paste0(raw_adj, " mean: ", round(mean_clinton, 2), "%")),
+                   position = "identity",
+                   show.legend = FALSE,
+                   hjust = 0) +
         scale_x_log10()
     }
     
@@ -351,12 +383,29 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                         intercept = state_trump - state_clinton, 
                         slope = 0)) +
         scale_linetype_manual(values = "dashed") +
+        geom_abline(data = mean_est,
+                    mapping = aes(color = raw_adj,
+                                  intercept = mean_trump - mean_clinton,
+                                  slope = c(0,0)),
+                    linetype = "dashed",
+                    show.legend = FALSE) +
         annotate("label", 
-                 x = unique(sort(data$xvar))[1], 
-                 y = max(data$trump - data$clinton, na.rm = T) + 5, 
-                 label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
-                 hjust = 0, 
+                 x = min(data$xvar), 
+                 y = max(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T) + 
+                       (max(data$trump - data$clinton, na.rm = T) - min(data$trump - data$clinton, na.rm = T))/5, 
+                 label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), 
+                 hjust = 0,
                  vjust = 0) +
+        geom_label(data = mean_est,
+                   mapping = aes(x = rep(min(data$xvar), 2),
+                                 y = c(min(data$trump - data$clinton, na.rm = T) - 2,
+                                       min(data$trump - data$clinton, na.rm = T) - 
+                                         (max(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T) - 
+                                            min(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T))/10 - 2),
+                                 label = paste0(raw_adj, " mean: ", round(mean_trump - mean_clinton, 2), "%")),
+                   position = "identity",
+                   show.legend = FALSE,
+                   hjust = 0) +
         scale_x_log10()
     }
   }
