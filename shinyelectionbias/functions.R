@@ -28,7 +28,8 @@ plot_results <- function(data, who, xvar, state, box_labs) {
   
   if (xvar == "enddate") {
     
-    monthly_means <- data %>% # necessary because extracting text labels from the complete data
+    monthly_means <- data %>%
+      group_by(months, raw_adj) %>%# necessary because extracting text labels from the complete data
       summarise(month_mean_clinton = mean(month_mean_clinton), # is very very slow
                 month_mean_trump = mean(month_mean_trump))
     
