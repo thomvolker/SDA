@@ -418,22 +418,39 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                 clinton_m = median(clinton))
     
     if (who == "trump") {
+      
       gg_box_plot <- base_plot +
         geom_abline(aes(linetype = paste0("True population value in ", state), 
                         intercept = state_trump, 
-                        slope = 0)) +
-        scale_linetype_manual(values = "dashed") +
+                        slope = 0),
+                    linetype = "dashed") +
+        geom_abline(data = mean_est,
+                    mapping = aes(color = raw_adj,
+                                  intercept = mean_trump,
+                                  slope = c(0,0)),
+                    linetype = "dashed",
+                    show.legend = FALSE) +
         annotate("label", 
                  x = unique(sort(data$xvar))[1], 
-                 y = max(data$trump, na.rm = T), 
+                 y = max(data$trump, na.rm = T) + 2, 
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
-                 hjust = 0, 
+                 hjust = 0.5, 
                  vjust = 0) +
         geom_boxplot(mapping = aes(y = trump, 
                                    fill = raw_adj, 
                                    color = NULL),
                      outlier.alpha = .25,
-                     position = "dodge2")
+                     position = "dodge2") +
+        geom_label(data = mean_est,
+                   mapping = aes(x = rep(unique(sort(data$xvar))[1], 2),
+                                 y = c(min(data$trump, na.rm = T) - 2,
+                                       min(data$trump, na.rm = T) - 
+                                         (max(c(data$trump, state_trump), na.rm = T) - 
+                                            min(c(data$trump, state_trump), na.rm = T))/10 - 2),
+                                 label = paste0(raw_adj, " mean: ", round(mean_trump, 2), "%")),
+                   position = "identity",
+                   show.legend = FALSE,
+                   hjust = 0.5)
       
       if(box_labs) {
         gg_box_plot + 
@@ -456,19 +473,35 @@ plot_results <- function(data, who, xvar, state, box_labs) {
       gg_box_plot <- base_plot +
         geom_abline(aes(linetype = paste0("True population value in ", state), 
                         intercept = state_clinton, 
-                        slope = 0)) +
-        scale_linetype_manual(values = "dashed") +
+                        slope = 0),
+                    linetype = "dashed") +
+        geom_abline(data = mean_est,
+                    mapping = aes(color = raw_adj,
+                                  intercept = mean_clinton,
+                                  slope = c(0,0)),
+                    linetype = "dashed",
+                    show.legend = FALSE) +
         annotate("label", 
                  x = unique(sort(data$xvar))[1], 
-                 y = max(data$clinton, na.rm = T), 
+                 y = max(data$clinton, na.rm = T) + 2, 
                  label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), 
-                 hjust = 0, 
+                 hjust = 0.5, 
                  vjust = 0) +
         geom_boxplot(mapping = aes(y = clinton, 
                                    fill = raw_adj, 
                                    color = NULL),
                      outlier.alpha = .25,
-                     position = "dodge2")
+                     position = "dodge2") +
+        geom_label(data = mean_est,
+                   mapping = aes(x = rep(unique(sort(data$xvar))[1], 2),
+                                 y = c(min(data$clinton, na.rm = T) - 2,
+                                       min(data$clinton, na.rm = T) - 
+                                         (max(c(data$clinton, state_clinton), na.rm = T) - 
+                                            min(data$clinton, na.rm = T))/10 - 2),
+                                 label = paste0(raw_adj, " mean: ", round(mean_clinton, 2), "%")),
+                   position = "identity",
+                   show.legend = FALSE,
+                   hjust = 0.5)
       
       if(box_labs) {
         gg_box_plot + 
@@ -492,19 +525,35 @@ plot_results <- function(data, who, xvar, state, box_labs) {
       gg_box_plot <- base_plot +
         geom_abline(aes(linetype = paste0("True population value in ", state), 
                         intercept = state_trump - state_clinton, 
-                        slope = 0)) +
-        scale_linetype_manual(values = "dashed") +
+                        slope = 0),
+                    linetype = "dashed") +
+        geom_abline(data = mean_est,
+                    mapping = aes(color = raw_adj,
+                                  intercept = mean_trump - mean_clinton,
+                                  slope = c(0,0)),
+                    linetype = "dashed",
+                    show.legend = FALSE) +
         annotate("label", 
                  x = unique(sort(data$xvar))[1], 
-                 y = max(data$trump - data$clinton, na.rm = T), 
+                 y = max(data$trump - data$clinton, na.rm = T) + 2, 
                  label = paste0("Election ", state, ": ", round(state_trump - state_clinton, digits = 2), "%"), 
-                 hjust = 0, 
+                 hjust = 0.5, 
                  vjust = 0) +
         geom_boxplot(mapping = aes(y = trump - clinton, 
                                    fill = raw_adj, 
                                    color = NULL),
                      outlier.alpha = .25,
-                     position = "dodge2")
+                     position = "dodge2") +
+        geom_label(data = mean_est,
+                   mapping = aes(x = rep(unique(sort(data$xvar))[1], 2),
+                                 y = c(min(data$trump - data$clinton, na.rm = T) - 2,
+                                       min(data$trump - data$clinton, na.rm = T) - 
+                                         (max(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T) - 
+                                            min(c(data$trump - data$clinton, state_trump - state_clinton), na.rm = T))/10 - 2),
+                                 label = paste0(raw_adj, " mean: ", round(mean_trump - mean_clinton, 2), "%")),
+                   position = "identity",
+                   show.legend = FALSE,
+                   hjust = 0.5)
       
       if(box_labs) {
         gg_box_plot + 
