@@ -106,6 +106,11 @@ data <- data %>%
          month_mean_trump = mean(trump, na.rm = T)) %>%
   mutate(population = recode(population, 
                              "lv" = "Likely voters",
-                             "rv" = "Registered voters"))
+                             "rv" = "Registered voters"),
+         grade = recode(grade,
+                        "A+" = "A+", "A" = "A", "A-" = "A-",
+                        "B+" = "B+", "B" = "B", "B-" = "B-",
+                        "C+" = "C+", "C" = "C", "C-" = "C-",
+                        "D" = "D", .default = "Not rated"))
 
 data$population[!data$population %in% c("Likely voters", "Registered voters")] <- "Other"
