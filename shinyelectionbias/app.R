@@ -57,13 +57,15 @@ server <- function(input, output, session) {
   output$data_source <- renderUI({
     tagList(paste0("The poll data is retrieved from "), 
             a("https://projects.fivethirtyeight.com/2016-election-forecast/?ex_cid=rrpromo#plus",
-              href = "https://projects.fivethirtyeight.com/2016-election-forecast/?ex_cid=rrpromo#plus"))
+              href = "https://projects.fivethirtyeight.com/2016-election-forecast/?ex_cid=rrpromo#plus",
+              style = "word-wrap: break-word;"))
   })
   
   output$shiny_code <- renderUI({
     tagList(paste0("The R-code used to make this Shiny application can be found on "),
             a("https://github.com/thomvolker/SDA",
-              href = "https://github.com/thomvolker/SDA"))
+              href = "https://github.com/thomvolker/SDA",
+              style = "word-wrap: break-word;"))
   })
 }
 
