@@ -19,8 +19,8 @@ plot_results <- function(data, who, xvar, state, box_labs) {
     ggplot(aes(x = xvar, color = raw_adj)) + 
     ylab("Proportion of votes") +
     xlab(paste(names(xvar_choices)[xvar == xvar_choices])) +
-    scale_color_brewer(palette = "Set1") +
-    scale_fill_brewer(palette = "Set1") +
+    scale_color_brewer(palette = "Paired") +
+    scale_fill_brewer(palette = "Paired") +
     theme_classic() +
     theme(legend.position = "bottom", 
           legend.title = element_blank(),
