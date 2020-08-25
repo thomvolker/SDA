@@ -37,34 +37,6 @@ ui <- navbarPage("Survey Data Analysis",
     )
   )
 )
- 
- 
-  # 
-  # fluidRow(
-  #   column(3,
-  #          selectInput("state", "State", unique(data$state)[c(1, order(unique(data$state)[-1]) + 1)])
-  #          )),
-  # fluidRow(
-  #   column(3,
-  #          selectInput("who", "Trump and/or Clinton", c("Trump" = "trump", "Clinton" = "clinton", "Difference (Trump - Clinton)" = "dif"))
-  #          )),
-  # fluidRow(
-  #   column(4, 
-  #          sliderInput("period", "Poll period", min = min(data$enddate), max(data$enddate), 
-  #                      value = c(min(data$enddate), max(data$enddate)))
-  #          )
-  # ),
-  # fluidRow(
-  #   column(3,
-  #          selectInput("xvar", "Independent variable", 
-  #                      c("End of survey" = "enddate", "Grade" = "grade", 
-  #                        "Sample size" = "samplesize", 
-  #                        "Population" = "population"))
-  #          )
-  # ),
-  # fluidRow(
-  #   plotOutput("results")
-  # )
 
 server <- function(input, output, session) {
   
