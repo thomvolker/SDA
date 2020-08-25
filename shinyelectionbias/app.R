@@ -46,6 +46,7 @@ server <- function(input, output, session) {
                         filter(grade %in% input$grade) %>%
                         select(xvar = input$xvar, state, clinton, trump, raw_adj, months,
                                pop_clinton, pop_trump, raw_adj_dif_clinton, raw_adj_dif_trump) %>%
+                        filter(!is.na(xvar)) %>%
                         group_by(months, raw_adj) %>%
                         mutate(month_mean_clinton = mean(clinton, na.rm = T),
                                month_mean_trump = mean(trump, na.rm = T))) 
