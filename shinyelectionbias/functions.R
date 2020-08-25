@@ -19,8 +19,8 @@ plot_results <- function(data, who, xvar, state, box_labs) {
     ggplot(aes(x = xvar, color = raw_adj)) + 
     ylab("Proportion of votes") +
     xlab(paste(names(xvar_choices)[xvar == xvar_choices])) +
-    scale_color_brewer(palette = "Paired") +
-    scale_fill_brewer(palette = "Paired") +
+    scale_color_brewer(palette = "Dark2") +
+    scale_fill_brewer(palette = "Dark2") +
     theme_classic() +
     theme(legend.position = "bottom", 
           legend.title = element_blank(),
@@ -59,8 +59,7 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                        label = paste0(round(month_mean_trump, digits = 1), "%")),
                    position = "identity", 
                    show.legend = FALSE, 
-                   hjust = 0) +
-         ylim(0, 100)
+                   hjust = 0)
       
     }
     else if (who == "clinton") {
@@ -83,14 +82,12 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                        label = paste0(round(month_mean_clinton, digits = 1), "%")),
                    position = "identity", 
                    show.legend = FALSE, 
-                   hjust = 0) +
-        ylim(0, 100)
+                   hjust = 0)
       
     }
     else if (who == "dif") {
       
       base_plot +
-        ylim(-100, 100) +
         geom_point(aes(y = trump - clinton), 
                    size = .5) +
         geom_abline(aes(linetype = paste0("True population value in ", state), 
@@ -234,8 +231,7 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
                  hjust = 0, 
                  vjust = 0) +
-        scale_x_log10() +
-        ylim(0, 100)
+        scale_x_log10()
     }
     
     else if (who == "clinton") {
@@ -252,8 +248,7 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                  label = paste0("Election ", state, ": ", round(state_clinton, digits = 2), "%"), 
                  hjust = 0, 
                  vjust = 0) +
-        scale_x_log10() +
-        ylim(0, 100)
+        scale_x_log10()
     }
     
     else if (who == "dif") {
@@ -270,8 +265,7 @@ plot_results <- function(data, who, xvar, state, box_labs) {
                  label = paste0("Election ", state, ": ", round(state_trump, digits = 2), "%"), 
                  hjust = 0, 
                  vjust = 0) +
-        scale_x_log10() +
-        ylim(-100, 100)
+        scale_x_log10()
     }
   }
   
