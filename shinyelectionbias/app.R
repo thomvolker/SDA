@@ -71,7 +71,7 @@ server <- function(input, output, session) {
   })
   output$warning_text <- renderText({
     if(input$box_labs & input$xvar %in% c("enddate", "samplesize")) {
-      paste0("<span style=\"color:red\"> The plot is no boxplot, so no medians are displayed. </span>")
+      paste0("<span style=\"color:red\"> The plot is not a boxplot, so no medians are displayed. </span>")
     }
   })
 }
