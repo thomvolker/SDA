@@ -1,6 +1,6 @@
 
-source("data_handling.R")
-source("functions.R")
+source("shinyelectionbias/data_handling.R")
+source("shinyelectionbias/functions.R")
 
 library(shiny)
 

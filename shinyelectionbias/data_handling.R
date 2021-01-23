@@ -9,7 +9,7 @@ library(tidyverse)
 ## semicolon, which we exclude from the data, additionally, there are five columns of
 ## nonsense in the dataframe (probably due to how I read the data in), which are 
 ## excluded as well).
-data <- read.csv("president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cycle != ";")
+data <- read.csv("shinyelectionbias/president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cycle != ";")
 
 #########################################################################################
 ## Add actual presidential results of 2016 election                                    ##
@@ -19,7 +19,7 @@ data <- read.csv("president_general_polls_2016_ed.csv")[,-(27:31)] %>% filter(cy
 unique(data$state)
 
 ## Load in a dataset with the population election results in all states
-pop_dat <- read.csv("1976-2016-president.csv")
+pop_dat <- read.csv("shinyelectionbias/1976-2016-president.csv")
 
 ## In the population data, extract only the rows concerning 2016, remove the variable
 ## party, which is not of any interest, but will mess up the pivoting, keep only Trump
