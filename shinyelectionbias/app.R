@@ -1,6 +1,6 @@
 
-source("shinyelectionbias/data_handling.R")
-source("shinyelectionbias/functions.R")
+source("data_handling.R")
+source("functions.R")
 
 library(shiny)
 
@@ -40,6 +40,8 @@ ui <- navbarPage("Survey Data Analysis",
 )
 
 server <- function(input, output, session) {
+  
+  options(shiny.sanitize.errors = FALSE)
   
   dataset <- reactive(data %>% 
                         filter(state == input$state) %>%

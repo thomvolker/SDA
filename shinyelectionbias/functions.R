@@ -6,7 +6,7 @@ Sys.setlocale("LC_TIME", "C")
 
 plot_results <- function(data, who, xvar, state, box_labs) {
   
-  if(nrow(data) == 0) {stop("There are no observations that meet the input requirements.")}
+  if (nrow(data) == 0) stop("There are no observations that meet the input requirements.")
   
   us_trump <- 46.1
   us_clinton <- 48.2
